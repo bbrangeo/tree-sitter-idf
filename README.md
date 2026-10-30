@@ -35,21 +35,40 @@ rev = "main"
 repository = "https://github.com/bbrangeo/tree-sitter-idf.git"
 ```
 
-Notes:
+Notes (each of these tripped us up — don't skip them):
 
-- the repository URL must include the `.git` suffix — Zed compares it exactly against `git remote get-url origin`
-- for dev extension installs, `grammars/idf` inside the extension must be a real git clone of this repository
-- highlight queries are loaded by Zed from the language directory (`languages/<lang>/highlights.scm`), not from this repo's `queries/`
+- the repository URL must include the `.git` suffix — Zed compares it exactly against `git remote get-url origin` (run with `GIT_CONFIG_GLOBAL=/dev/null`)
+- for dev extension installs, `grammars/idf` inside the extension must be a real git clone of this repository — Zed refuses a plain tracked directory ("already exists, but is not a git clone")
+- the grammar directory must **not** be committed to the extension repository: when packaging (CI `package` job), Zed's builder downloads the grammar itself from `repository`/`rev` (git init + fetch + checkout) and fails if the directory exists without being a git clone
+- highlight queries are loaded by Zed from the language directory (`languages/<lang>/highlights.scm`), **not** from this repo's `queries/` and not from `tree-sitter.json`'s `highlights` field — that field is only used by other tree-sitter tooling
+
+## Cloning for dev extension installs
+
+```sh
+git clone https://github.com/bbrangeo/tree-sitter-idf grammars/idf
+```
+
+Run inside the extension repository, then install the dev extension in Zed (`zed: install dev extension`).
 
 ## Standalone build
 
+Requires Node.js and the tree-sitter CLI:
+
 ```sh
 cd grammars/idf
-npm install        # tree-sitter-cli
-npx tree-sitter generate
+npm install                  # tree-sitter-cli
+npx tree-sitter generate     # regenerate src/parser.c from grammar.js
 npx tree-sitter parse your-model.idf
 ```
 
+Note: `src/parser.c` is generated and committed so that Zed's builder only has to compile it to WASM; re-run `tree-sitter generate` after editing `grammar.js`.
+
+## Used by
+
+- [idfkit](https://idfkit.com/) — EnergyPlus modeling tools (web app, MCP)
+- [bbrangeo/zed-idfkit](https://github.com/bbrangeo/zed-idfkit) — Zed extension: syntax highlighting + idfkit-lsp language server for `.idf`
+- [bbrangeo/zed-idfkit-mcp](https://github.com/bbrangeo/zed-idfkit-mcp) — Zed extension: MCP server for AI-assisted EnergyPlus modeling in the Agent Panel
+
 ## License
 
-MIT
+MIT — see [LICENSE](LICENSE).
