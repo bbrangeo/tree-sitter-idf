@@ -1,20 +1,32 @@
 /**
  * @file Tree-sitter grammar for EnergyPlus IDF files.
  *
- * IDF is a simple line-oriented data format:
- *  - comments start with `!` and run to end of line (often `!- ...` after a
- *    field). `!- ...` doc comments are distinguished from plain comments.
- *  - objects are an object type (possibly `Type:SubType`), followed by a
- *    comma-separated list of fields, terminated by `;`
- *  - fields are numbers (int / float / scientific), alphanumeric values,
- *    reserved keywords (`Yes`, `autosize`, ...), or empty (just a comma),
- *    with optional `!- comment` trailers
+ * IDF is a simple line-oriented data format. An object is an object type
+ * (possibly `Type:SubType`), followed by a comma-separated list of fields,
+ * terminated by `;`:
  *
- * The grammar is deliberately tolerant so that real-world (multi-megabyte)
- * IDF files parse without error nodes:
+ *   Construction,
+ *     Exterior Wall,           !- Name
+ *     Wall Insulation,         !- Outside Layer
+ *     Concrete;                !- Layer 2 {m}
+ *
+ *  - comments start with `!` and run to end of line. Field annotations
+ *    (`!- ...`) and plain comments (`! ...`) are matched by the same token
+ *    and only distinguished in the highlight queries.
+ *  - fields are numbers (int / float / scientific: `0`, `0.04`, `3.5E-6`,
+ *    `-0.4`, multi-dot versions like `9.4.0.002`), alphanumeric values,
+ *    reserved keywords (`Yes`, `Autosize`, ...), or empty (just a comma),
+ *    each with an optional `!- comment` trailer.
+ *
+ * Design goal: never fail on real-world (multi-megabyte) IDF files — the
+ * grammar is deliberately tolerant:
  *  - comments are `extras` (valid anywhere, never break a parse)
- *  - a catch-all string token handles any unexpected characters in values
+ *  - a low-precedence catch-all token absorbs any unexpected characters
+ *    in values
  *  - the BOM is skipped
+ *
+ * Validated against a real 14k-line whole-building calibration model:
+ * 100% parsed, zero ERROR nodes.
  */
 
 module.exports = grammar({
