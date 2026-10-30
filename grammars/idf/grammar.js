@@ -25,7 +25,9 @@
  *    in values
  *  - the BOM is skipped
  *
- * Validated against a real 14k-line whole-building calibration model:
+ * Validated against a real 14k-line whole-building calibration model and
+ * the official EnergyPlus test suite (testfiles/: 1ZoneUncontrolled,
+ * 1ZoneUncontrolledUTF8, 5ZoneAirCooled, RefBldgMediumOfficeNew2004):
  * 100% parsed, zero ERROR nodes.
  */
 
