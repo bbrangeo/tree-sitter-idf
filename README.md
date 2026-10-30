@@ -65,7 +65,6 @@ Note: `src/parser.c` is generated and committed so that Zed's builder only has t
 
 ## Used by
 
-- [idfkit](https://idfkit.com/) — EnergyPlus modeling tools (web app, MCP)
 - [bbrangeo/zed-idfkit](https://github.com/bbrangeo/zed-idfkit) — Zed extension: syntax highlighting + idfkit-lsp language server for `.idf`
 - [bbrangeo/zed-idfkit-mcp](https://github.com/bbrangeo/zed-idfkit-mcp) — Zed extension: MCP server for AI-assisted EnergyPlus modeling in the Agent Panel
 
